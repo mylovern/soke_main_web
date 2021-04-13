@@ -4,9 +4,7 @@
     <div class="data_table">
       <div class="table_title">
         <div>总量：{{ allfundnum }}份，已售{{ allfundnum - remain_volume }}份</div>
-        <div>
-          {{ (((remain_volume - allfundnum) / allfundnum) * 100).toFixed(2) * 1 }}%
-        </div>
+        <div>{{ percent }}%</div>
       </div>
       <div class="percent">
         <el-progress :percentage="percent" color="#945EF2"></el-progress>
@@ -59,7 +57,8 @@
 </template>
 
 <script>
-import { fundlist, orderfunds } from "../api";
+import { fundlist, orderfunds, formalfund } from "../api";
+import { transfermain } from "../assets/web3";
 export default {
   mounted() {
     this.id = this.$route.query.id;
@@ -73,7 +72,7 @@ export default {
               this.remain_volume = v.remain_volume;
               this.periods = v.periods;
               this.unit_price = v.unit_price;
-              this.percent = ((v.remain_volume - v.total_volume) / v.total_volume) * 100;
+              this.percent = ((v.total_volume - v.remain_volume) / v.total_volume) * 100;
               this.profit = v.periods[0].profit * 100;
             }
           }
@@ -81,7 +80,7 @@ export default {
           this.$message.error(res.data.message);
           localStorage.removeItem("token");
           localStorage.removeItem("address");
-          this.$router.push('/main')
+          this.$router.push("/main");
         } else {
           this.$message.error(res.data.message);
         }
@@ -128,11 +127,41 @@ export default {
               message: res.data.message,
               type: "success",
             });
+            transfermain(
+              res.data.data.to,
+              localStorage.getItem("address"),
+              (this.num * this.unit_price)
+            )
+              .then((data) => {
+                if (data) {
+                  formalfund(
+                    { no: res.data.data.no, id: data },
+                    localStorage.getItem("token")
+                  )
+                    .then((response) => {
+                      if (response.status == 200) {
+                        this.$message({
+                          message: "下单成功",
+                          type: "success",
+                        });
+                        location.reload();
+                      } else {
+                        this.$message.error("下单失败");
+                      }
+                    })
+                    .catch((er) => {
+                      console.log(er);
+                    });
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           } else if (res.data.code == 403) {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");
             localStorage.removeItem("address");
-            this.$router.push('/main')
+            this.$router.push("/main");
           } else {
             this.$message.error(res.data.message);
           }

@@ -54,7 +54,7 @@
 import { historyorders } from "../api";
 export default {
   mounted() {
-    historyorders(localStorage.getItem("token"))
+    historyorders({ page: 1, per_page: 1 }, localStorage.getItem("token"))
       .then((res) => {
         console.log(res);
         this.orderlist = res.data.data;
@@ -78,6 +78,7 @@ export default {
   box-shadow: 0px 0px 7px 0px rgba(146, 95, 243, 0.15);
   border-radius: 6px;
   padding: 40px 30px 0px;
+  margin-bottom: 20px;
   .title {
     display: flex;
     align-items: center;

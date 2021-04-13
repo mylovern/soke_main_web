@@ -98,9 +98,10 @@ export function noworders(token) {
     })
 }
 //获取历史委托
-export function historyorders(token) {
+export function historyorders(params, token) {
     return axios({
         method: 'get',
+        params: params,
         url: `${baseurl}/api/v1/contract/history/orders`,
         headers: {
             Authorization: 'Bearer ' + token,
@@ -329,9 +330,10 @@ export function formalrecharge(p, token) {
 }
 
 //算力挖矿
-export function powerrewrad(token) {
+export function powerrewrad(p, token) {
     return axios({
         method: 'get',
+        params: p,
         url: `${baseurl}/api/v1/power/reward/logs`,
         headers: {
             Authorization: 'Bearer ' + token,
@@ -352,7 +354,21 @@ export function marketrewrad(token) {
 export function contractrewrad(token) {
     return axios({
         method: 'get',
+        // params: params,
         url: `${baseurl}/api/v1/contract/reward/logs`,
+        headers: {
+            Authorization: 'Bearer ' + token,
+        }
+    })
+}
+
+//基金正式下单
+export function formalfund(p, token) {
+    var data = qs.stringify(p)
+    return axios({
+        method: 'post',
+        data: data,
+        url: `${baseurl}/api/v1/fund/product/buy`,
         headers: {
             Authorization: 'Bearer ' + token,
         }

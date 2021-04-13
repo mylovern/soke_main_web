@@ -64,7 +64,7 @@
         </div>
         <div class="my_okt_main">
           <div @click="dialogpledge()">我要质押</div>
-          <div @click="dialogpledgeremove()">解除质押</div>
+          <div @click="dialogpledgeremovesoke()">解除质押</div>
         </div>
       </div>
       <div class="my_okt">
@@ -127,7 +127,12 @@
       <div class="pool_block_main">
         <div>
           <div>
-            剩余(SOKE):<span> {{ balance }}</span>
+            <div>
+              我的质押OKT:<span> {{ myplodge }}</span>
+            </div>
+            <div>
+              剩余(soke):<span>{{ poolbalance }}</span>
+            </div>
           </div>
           <div style="cursor: pointer" @click="changerouter('/flowdata')">
             当前收益: <span>1 OKT:{{ allpledge }} SOKE</span>
@@ -163,7 +168,7 @@
       </div>
       <div class="soke_start_main">
         <div>
-          剩余(SOKE):<span> {{ balance }}</span>
+          <!-- 我的质押OKT:<span> {{ balance }}</span> -->
         </div>
         <div>
           当前挖矿收益:<span>1算力:{{ power_rate }}SOKE</span>
@@ -212,12 +217,12 @@
                 { down_color: v.periods[0].profit <= 0 },
               ]"
             >
-              {{ v.periods[0].profit }}%
+              当前年化收益:{{ v.periods[0].profit * 100 }}%
             </div>
           </div>
           <div>
             <el-progress
-              :percentage="((v.remain_volume - v.total_volume) / v.total_volume) * 100"
+              :percentage="((v.total_volume - v.remain_volume) / v.total_volume) * 100"
               :color="v.periods[0].profit > 0 ? '#008555' : '#d60f2a'"
             ></el-progress>
           </div>
@@ -310,7 +315,20 @@
         <div @click="removepledge()" class="sure_p_btn">确定解除</div>
       </div>
     </el-dialog>
-
+    <!-- 解除质押 -->
+    <el-dialog title="解除质押" :visible.sync="removePledgesoke" width="30%" center>
+      <div class="pledge_wrapper">
+        <div class="pledge_num">
+          <div>金额</div>
+          <div><span>可用(SOKE):</span>{{ mydata.market_pledge }}</div>
+        </div>
+        <div class="pledge_inp">
+          <input v-model="pNumremove" type="text" />
+          <span>SOKE</span>
+        </div>
+        <div @click="removepledge()" class="sure_p_btn">确定解除</div>
+      </div>
+    </el-dialog>
     <!-- 充值弹框 -->
     <el-dialog title="充值SOKE" :visible.sync="recharge" width="30%" center>
       <div class="pledge_wrapper">
@@ -338,7 +356,7 @@
         </div>
         <div class="pledge_num">
           <div>提现金额</div>
-          <div><span>可用(SOKE):</span>12121.00</div>
+          <div><span>可用(SOKE):</span>{{ mydata.balance }}</div>
         </div>
         <div class="pledge_inp">
           <input v-model="despoitnumorder" type="text" />
@@ -390,9 +408,16 @@ import {
   getprof,
   getwithdraw,
   getbalanceokt,
+  getmypledge,
 } from "../assets/web3";
 export default {
   mounted() {
+    if (!this.checkmetamask()) {
+      this.$message.error("请先安装MetaMask");
+      setTimeout(() => {
+        this.walletcheck = true;
+      }, 2000);
+    }
     if (window.ethereum.selectedAddress == null) {
       this.walletcheck = true;
     } else {
@@ -426,16 +451,28 @@ export default {
         location.reload();
       }
     });
+    //获取我的质押
+    getmypledge(this.copyaddress)
+      .then((res) => {
+        this.myplodge = res / 1000000000000000000;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     getallple()
       .then((res) => {
-        this.allpledge = (1000 / (res / 100000000000000000)).toFixed(6);
+        if (res == 0) {
+          this.allpledge = 0;
+        } else {
+          this.allpledge = (1000 / (res / 1000000000000000000)).toFixed(6);
+        }
       })
       .catch((err) => {
         console.log(err);
       });
     //查询OKT余额
     getbalanceokt(this.copyaddress).then((res) => {
-      this.oktbalance = (res / 100000000000000000).toFixed(6);
+      this.oktbalance = (res / 1000000000000000000).toFixed(6);
     });
 
     //  查询soke矿池余额
@@ -447,9 +484,9 @@ export default {
       this.balance = (res / 1000000).toFixed(6);
     });
     //获取当前可领取的收益
-    getprof()
+    getprof(this.copyaddress)
       .then((res) => {
-        this.nowincome = (res * 1).toFixed(6);
+        this.nowincome = ((res * 1) / 1000000).toFixed(6);
       })
       .catch((err) => {
         console.log(err);
@@ -538,7 +575,7 @@ export default {
       walletcheck: false,
       account: undefined,
       no: undefined,
-      Pledgepool: 0,
+      Pledgepool: false,
       balance: 0,
       pNumpool: undefined,
       allpledge: 0,
@@ -547,6 +584,8 @@ export default {
       nowincome: 0,
       oktbalance: 0,
       incentive_pool: 0.0,
+      removePledgesoke: false,
+      myplodge: 0.0,
     };
   },
   methods: {
@@ -582,6 +621,7 @@ export default {
           check(account);
           this.walletcheck = false;
           this.copyaddress = account;
+          localStorage.setItem("address", this.copyaddress);
           this.token = "login";
           this.message = `
       ${this.copyaddress.slice(0, 6)}...${this.copyaddress.slice(
@@ -657,6 +697,7 @@ export default {
                           message: res.data.message,
                           type: "success",
                         });
+                        location.reload();
                       } else if (re.data.code == 403) {
                         this.$message.error(re.data.message);
                         localStorage.removeItem("token");
@@ -857,7 +898,7 @@ export default {
               type: "success",
             });
             this.no = res.data.data.no;
-            transfermain(res.data.to, this.copyaddress, this.pNum)
+            transfermain(res.data.data.to, this.copyaddress, this.pNum)
               .then((res) => {
                 formalpledge({ no: this.no, id: res }, localStorage.getItem("token"))
                   .then((res) => {
@@ -866,14 +907,15 @@ export default {
                         message: "质押成功",
                         type: "success",
                       });
-                      // location.reload();
+                      location.reload();
                     }
                   })
                   .catch((err) => {
                     console.log(err);
                   });
               })
-              .catch(() => {
+              .catch((err) => {
+                console.log(err);
                 this.$message.error("质押失败");
               });
             // var mynetcontract=new web3.eth([],)
@@ -903,7 +945,7 @@ export default {
             message: "质押成功",
             type: "success",
           });
-          // location.reload();
+          location.reload();
         })
         .catch(() => {
           this.$message.error("质押失败请重试");
@@ -949,6 +991,7 @@ export default {
               message: res.data.message,
               type: "success",
             });
+            location.reload();
           } else if (res.data.code == 403) {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");
@@ -973,6 +1016,19 @@ export default {
         });
       } else {
         this.removePledge = !this.removePledge;
+      }
+    },
+    dialogpledgeremovesoke() {
+      if (localStorage.getItem("token") == null) {
+        check(this.copyaddress).then((res) => {
+          if (res) {
+            this.removePledgesoke = !this.removePledgesoke;
+          } else {
+            this.$message.error("授权失败请重试");
+          }
+        });
+      } else {
+        this.removePledgesoke = !this.removePledgesoke;
       }
     },
     dialogrecharge() {
@@ -1231,24 +1287,28 @@ export default {
     }
   }
   .pool_block_main {
-    & > div {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
     & > div:nth-child(1) {
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 24px;
       & > div {
         font-size: 16px;
         font-family: Microsoft YaHei;
         font-weight: 400;
         color: #737373;
+        & > div {
+          margin-bottom: 20px;
+        }
         span {
           color: #000000;
+          margin-right: 20px;
         }
       }
     }
     & > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       & > div:nth-child(1) {
         font-size: 16px;
         font-family: Microsoft YaHei;
@@ -1600,7 +1660,7 @@ export default {
     margin-right: 60px;
   }
   & > div {
-    width: 200px;
+    width: 21.73vw;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1616,6 +1676,7 @@ export default {
     margin-bottom: 8px;
     & > img {
       cursor: pointer;
+      width: 60%;
     }
   }
 }

@@ -55,6 +55,10 @@
           <div @click="getfundback(v.id, v.unit_price, v.period, v.volume)">赎回</div>
         </div>
       </div>
+      <div class="nodata_wrapper" v-show="fundhis == null || fundhis.length == 0">
+        <img src="../assets/img/no.png" alt="" />
+        <div>暂无数据</div>
+      </div>
     </div>
 
     <div v-show="tableshow == 1" class="redemption">
@@ -100,6 +104,10 @@
           <div>{{ v.created_at }}</div>
         </div>
       </div>
+      <div class="nodata_wrapper" v-show="fundbackhis == null || fundbackhis.length == 0">
+        <img src="../assets/img/no.png" alt="" />
+        <div>暂无数据</div>
+      </div>
     </div>
   </div>
 </template>
@@ -116,7 +124,7 @@ export default {
           this.$message.error(res.data.message);
           localStorage.removeItem("token");
           localStorage.removeItem("address");
-          this.$router.push('/main')
+          this.$router.push("/main");
         } else {
           this.$message.error(res.data.message);
         }
@@ -132,7 +140,7 @@ export default {
           this.$message.error(res.data.message);
           localStorage.removeItem("token");
           localStorage.removeItem("address");
-          this.$router.push('/main')
+          this.$router.push("/main");
         } else {
           this.$message.error(res.data.message);
         }

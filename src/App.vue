@@ -31,4 +31,14 @@
 .down_color_bg {
   background: #d60f2a !important;
 }
+.nodata_wrapper {
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.nodata_wrapper img {
+  margin-bottom: 20px;
+}
 </style>

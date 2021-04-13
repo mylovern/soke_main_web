@@ -366,9 +366,7 @@ export default {
       this.websock.onerror = this.websockError; //监听服务器发送的消息
       this.websock.onmessage = this.websockMessage;
     },
-    websockOpen(e) {
-      console.log(e);
-    },
+    websockOpen() {},
     websockClose(e) {
       console.log(e);
     },
@@ -378,15 +376,17 @@ export default {
     websockMessage(e) {
       if (e.data !== "Opened") {
         let obj = JSON.parse(e.data);
-        console.log(obj);
+
         if (obj.ch == "index.positions") {
           this.position = obj.data;
+        }
+        if (obj.ch == "index.orders") {
+          this.order = obj.data;
         }
       }
     },
     //撤单
     getoutorder(id) {
-      console.log(id);
       closeorder({ id }, localStorage.getItem("token"))
         .then((res) => {
           if (res.data.code == 200) {
@@ -394,6 +394,7 @@ export default {
               message: res.data.message,
               type: "success",
             });
+            location.reload();
           } else if (res.data.code == 403) {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");
@@ -416,6 +417,7 @@ export default {
               message: res.data.message,
               type: "success",
             });
+            location.reload();
           } else if (res.data.code == 403) {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");

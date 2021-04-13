@@ -12,7 +12,12 @@
       <div class="pool_block_main">
         <div>
           <div>
-            剩余(SOKE):<span> {{ balance }}</span>
+            <div>
+              我的质押OKT:<span> {{ myplodge }}</span>
+            </div>
+            <div>
+              剩余(soke):<span>{{ poolbalance }}</span>
+            </div>
           </div>
           <div style="cursor: pointer" @click="tolist()">
             当前收益: <span>1 OKT:{{ allpledge }} SOKE</span>
@@ -48,7 +53,7 @@
       </div>
       <div class="soke_start_main">
         <div>
-          剩余(SOKE):<span> {{ balance }}</span>
+          <!-- 剩余(SOKE):<span> {{ balance }}</span> -->
         </div>
         <div>
           当前挖矿收益:<span>1算力:{{ power_rate }} SOKE</span>
@@ -96,7 +101,8 @@ import {
   getallple,
   getprof,
   getwithdraw,
-  getbalanceokt
+  getbalanceokt,
+  getmypledge,
 } from "../assets/web3";
 export default {
   mounted() {
@@ -105,15 +111,30 @@ export default {
     getbalanceokt(this.copyaddress).then((res) => {
       this.oktbalance = (res / 100000000000000000).toFixed(6);
     });
-    //查询钱包余额
+    //  查询soke矿池余额
+    balancedata("0xe871e5b1109950a3ba75d546edd3f166ec93e4af").then((res) => {
+      this.poolbalance = (res / 1000000).toFixed(6);
+    });
     //查询钱包余额
     balancedata(this.copyaddress).then((res) => {
       this.balance = (res / 1000000).toFixed(6);
     });
+    //获取我的质押
+    getmypledge()
+      .then((res) => {
+        this.myplodge = res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     //获取总质押
     getallple()
       .then((res) => {
-        this.allpledge = (1000 / (res / 100000000000000000)).toFixed(6);
+        if (res == 0) {
+          this.allpledge = 0;
+        } else {
+          this.allpledge = (1000 / (res / 100000000000000000)).toFixed(6);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -132,6 +153,11 @@ export default {
         this.global = res.data.data.global;
         this.mydata = res.data.data.my;
         this.power_rate = res.data.data.power.power_rate;
+        if (!res.data.data.power.is_open_power) {
+          this.startp = false;
+        } else {
+          this.startp = true;
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -167,6 +193,8 @@ export default {
       power_rate: undefined,
       nowincome: undefined,
       oktbalance: undefined,
+      myplodge: 0,
+      poolbalance: 0,
     };
   },
   methods: {
@@ -208,7 +236,7 @@ export default {
                     this.$message.error(res.data.message);
                     localStorage.removeItem("token");
                     localStorage.removeItem("address");
-                    location.reload();
+                    // location.reload();
                   } else {
                     this.$message.error(res.data.message);
                   }
@@ -229,7 +257,7 @@ export default {
                     this.$message.error(res.data.message);
                     localStorage.removeItem("token");
                     localStorage.removeItem("address");
-                    location.reload();
+                    // location.reload();
                   } else {
                     this.$message.error(res.data.message);
                   }
@@ -242,6 +270,51 @@ export default {
             this.$message.error("授权失败请重试");
           }
         });
+      } else {
+        this.startp = !this.startp;
+        if (this.startp) {
+          powerstart(localStorage.getItem("token"))
+            .then((res) => {
+              console.log(res);
+              if (res.data.code == 200) {
+                this.$message({
+                  message: res.data.message,
+                  type: "success",
+                });
+              } else if (res.data.code == 403) {
+                this.$message.error(res.data.message);
+                localStorage.removeItem("token");
+                localStorage.removeItem("address");
+                // location.reload();
+              } else {
+                this.$message.error(res.data.message);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          powerclose(localStorage.getItem("token"))
+            .then((res) => {
+              console.log(res);
+              if (res.data.code == 200) {
+                this.$message({
+                  message: res.data.message,
+                  type: "success",
+                });
+              } else if (res.data.code == 403) {
+                this.$message.error(res.data.message);
+                localStorage.removeItem("token");
+                localStorage.removeItem("address");
+                // location.reload();
+              } else {
+                this.$message.error(res.data.message);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
       }
     }, //矿池质押
     sendpledgepool() {
@@ -374,25 +447,28 @@ export default {
     }
   }
   .pool_block_main {
-    & > div {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
     & > div:nth-child(1) {
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 24px;
       & > div {
         font-size: 16px;
         font-family: Microsoft YaHei;
         font-weight: 400;
         color: #737373;
+        & > div {
+          margin-bottom: 20px;
+        }
         span {
           color: #000000;
-          font-weight: bold;
+          margin-right: 20px;
         }
       }
     }
     & > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       & > div:nth-child(1) {
         font-size: 16px;
         font-family: Microsoft YaHei;
@@ -400,7 +476,6 @@ export default {
         color: #737373;
         span {
           color: #000000;
-          font-weight: bold;
         }
       }
       & > div:nth-child(2) {
@@ -522,5 +597,17 @@ export default {
   text-align: center;
   margin: 0 auto;
   cursor: pointer;
+}
+.startpollbtn {
+  width: 216px;
+  height: 46px;
+  background: #925ff3;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: PingFang SC;
+  font-weight: bold;
+  color: #f4effe;
+  line-height: 46px;
+  text-align: center;
 }
 </style>

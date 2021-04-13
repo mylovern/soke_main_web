@@ -25,7 +25,7 @@
           </div>
           <div>
             <el-progress
-              :percentage="((v.remain_volume - v.total_volume) / v.total_volume) * 100"
+              :percentage="((v.total_volume - v.remain_volume) / v.total_volume) * 100"
               :color="v.periods[0].profit > 0 ? '#008555' : '#d60f2a'"
             ></el-progress>
           </div>
@@ -52,7 +52,7 @@ export default {
           this.$message.error(res.data.message);
           localStorage.removeItem("token");
           localStorage.removeItem("address");
-          this.$router.push('/main')
+          this.$router.push("/main");
         } else {
           this.$message.error(res.data.message);
         }

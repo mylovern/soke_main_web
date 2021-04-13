@@ -16,27 +16,96 @@
       </div>
     </div>
     <div v-show="shownum == 0" class="data_list">
-      <div v-for="(v, i) in powerlist" :key="i">
-        <div>{{ v.reward }}</div>
-        <div>{{ v.created_at }}</div>
+      <div>
+        <div class="data_table_main" v-for="(v, i) in powerlist" :key="i">
+          <div>{{ v.reward }}</div>
+          <div>{{ v.created_at }}</div>
+        </div>
+        <div>
+          <el-pagination
+            :total="allpowerpool"
+            :page-size="10"
+            @current-change="pagechangepower"
+            background
+            layout="prev, pager, next"
+          >
+          </el-pagination>
+        </div>
       </div>
-    </div>
-    <div v-show="shownum == 1" class="data_list">
-      <div v-for="(v, i) in contractlist" :key="i">
-        <div>{{ v.reward }}</div>
-        <div>{{ v.created_at }}</div>
+
+      <div class="nodata_wrapper" v-show="powerlist.length == 0">
+        <img src="../assets/img/no.png" alt="" />
+        <div>暂无数据</div>
       </div>
     </div>
     <div v-show="shownum == 2" class="data_list">
-      <div v-for="(v, i) in marketlist" :key="i">
-        <div>{{ v.reward }}</div>
-        <div>{{ v.created_at }}</div>
+      <div>
+        <div class="data_table_main" v-for="(v, i) in contractlist" :key="i">
+          <div>{{ v.reward }}</div>
+          <div>{{ v.created_at }}</div>
+        </div>
+        <div>
+          <el-pagination
+            :total="allmarketnum"
+            :page-size="10"
+            @current-change="pagechangemarket"
+            background
+            layout="prev, pager, next"
+          >
+          </el-pagination>
+        </div>
+      </div>
+
+      <div class="nodata_wrapper" v-show="contractlist.length == 0">
+        <img src="../assets/img/no.png" alt="" />
+        <div>暂无数据</div>
+      </div>
+    </div>
+    <div v-show="shownum == 1" class="data_list">
+      <div v-show="marketlist.length !== 0">
+        <div class="data_table_main" v-for="(v, i) in marketlist" :key="i">
+          <div :class="[{ rise_color: v.reward > 0 }, { down_color: v.reward <= 0 }]">
+            <span v-show="v.reward > 0">+</span>{{ v.reward }}
+          </div>
+          <div>{{ v.created_at }}</div>
+        </div>
+        <div>
+          <el-pagination
+            :total="allpagemarket"
+            :page-size="10"
+            @current-change="pagechange"
+            background
+            layout="prev, pager, next"
+          >
+          </el-pagination>
+        </div>
+      </div>
+      <div class="nodata_wrapper" v-show="marketlist.length == 0">
+        <img src="../assets/img/no.png" alt="" />
+        <div>暂无数据</div>
       </div>
     </div>
     <div v-show="shownum == 3" class="data_list">
-      <div v-for="(v, i) in fundloss" :key="i">
-        <div>{{ v.reward }}</div>
-        <div>{{ v.created_at }}</div>
+      <div>
+        <div class="data_table_main" v-for="(v, i) in fundloss" :key="i">
+          <div>{{ v.reward }}</div>
+          <div>{{ v.created_at }}</div>
+        </div>
+        <div>
+          <el-pagination
+            :total="allpagefund"
+            :page-size="10"
+            @current-change="pagechangefund"
+            background
+            layout="prev, pager, next"
+          >
+          </el-pagination>
+        </div>
+      </div>
+
+      <div class="nodata_wrapper" v-show="fundloss.length == 0">
+        <img src="../assets/img/no.png" alt="" />
+        <div>暂无数据</div>
       </div>
     </div>
   </div>
@@ -52,12 +121,17 @@ export default {
       powerlist: [],
       marketlist: [],
       contractlist: [],
+      allpagemarket: 0,
+      allpowerpool: 0,
+      allmarketnum: 0,
+      allpagefund: 0,
     };
   },
   mounted() {
     marketrewrad(localStorage.getItem("token"))
       .then((res) => {
-        this.marketlist = res.data.data;
+        this.contractlist = res.data.data;
+        this.allpagemarket = res.data.page.total;
       })
       .catch((err) => {
         console.log(err);
@@ -69,9 +143,11 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-    powerrewrad(localStorage.getItem("token"))
+    powerrewrad({ page: 1, per_page: 1 }, localStorage.getItem("token"))
       .then((res) => {
+        console.log(res);
         this.powerlist = res.data.data;
+        this.allpowerpool = res.data.page.total;
       })
       .catch((err) => {
         console.log(err);
@@ -87,6 +163,18 @@ export default {
   methods: {
     changeTable(n) {
       this.shownum = n;
+    },
+    pagechange(e) {
+      console.log(e);
+    },
+    pagechangepower(e) {
+      console.log(e);
+    },
+    pagechangemarket(e) {
+      console.log(e);
+    },
+    pagechangefund(e) {
+      console.log(e);
     },
   },
 };
@@ -134,7 +222,7 @@ export default {
   }
 }
 .data_list {
-  & > div {
+  .data_table_main {
     height: 68px;
     background: #ffffff;
     box-shadow: 0px 0px 7px 0px rgba(146, 95, 243, 0.15);
@@ -150,6 +238,12 @@ export default {
       font-weight: 500;
       color: #000000;
     }
+  }
+  .nodata_wrapper {
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 .active {
