@@ -10,51 +10,66 @@
       </div>
     </div>
     <div v-show="tableshow == 0" class="buy_wrapper">
-      <div v-for="(v, i) in fundhis" :key="i" class="data_table">
-        <div class="head_data_table">
-          <div>{{ v.product.title }}</div>
+      <div v-show="fundhis !== null || fundhis.length !== 0">
+        <div v-for="(v, i) in fundhis" :key="i" class="data_table">
+          <div class="head_data_table">
+            <div>{{ v.product.title }}</div>
+            <div>
+              {{
+                v.status == 0
+                  ? "未付款"
+                  : v.status == 1
+                  ? "确认中"
+                  : v.status == 2
+                  ? "确认成功"
+                  : "确认失败"
+              }}
+            </div>
+          </div>
           <div>
-            {{
-              v.status == 0
-                ? "未付款"
-                : v.status == 1
-                ? "确认中"
-                : v.status == 2
-                ? "确认成功"
-                : "确认失败"
-            }}
+            <div>单价(SOKE/份)</div>
+            <div>{{ v.unit_price }}</div>
+          </div>
+
+          <div>
+            <div>周期</div>
+            <div>{{ v.period }}</div>
+          </div>
+
+          <div>
+            <div>支付(SOKE)</div>
+            <div>{{ v.amount }}</div>
+          </div>
+          <div>
+            <div>单号</div>
+            <div>{{ v.no }}</div>
+          </div>
+          <div>
+            <div>数量</div>
+            <div>{{ v.volume }}份</div>
+          </div>
+          <div>
+            <div>购买时间</div>
+            <div>{{ v.created_at }}</div>
+          </div>
+          <div class="redemption_btn">
+            <div
+              @click="getfundback(v.id, v.unit_price, v.period, v.volume, v.redeem_fee)"
+            >
+              赎回
+            </div>
           </div>
         </div>
-        <div>
-          <div>单价(SOKE/份)</div>
-          <div>{{ v.unit_price }}</div>
-        </div>
-
-        <div>
-          <div>周期</div>
-          <div>{{ v.period }}</div>
-        </div>
-
-        <div>
-          <div>支付(SOKE)</div>
-          <div>12121.00</div>
-        </div>
-        <div>
-          <div>单号</div>
-          <div>{{ v.no }}</div>
-        </div>
-        <div>
-          <div>数量</div>
-          <div>{{ v.volume }}份</div>
-        </div>
-        <div>
-          <div>购买时间</div>
-          <div>{{ v.created_at }}</div>
-        </div>
-        <div class="redemption_btn">
-          <div @click="getfundback(v.id, v.unit_price, v.period, v.volume)">赎回</div>
-        </div>
+        <el-pagination
+          :total="allbuy"
+          :page-size="10"
+          @current-change="pagechangebuy"
+          background
+          layout="prev, pager, next"
+        >
+        </el-pagination>
       </div>
+
       <div class="nodata_wrapper" v-show="fundhis == null || fundhis.length == 0">
         <img src="../assets/img/no.png" alt="" />
         <div>暂无数据</div>
@@ -62,48 +77,62 @@
     </div>
 
     <div v-show="tableshow == 1" class="redemption">
-      <div v-for="(v, i) in fundbackhis" :key="i" class="data_table">
-        <div class="head_data_table">
-          <div>{{ v.product.title }}</div>
+      <div v-show="fundbackhis !== null || fundbackhis.length !== 0">
+        <div v-for="(v, i) in fundbackhis" :key="i" class="data_table">
+          <div class="head_data_table">
+            <div>{{ v.product.title }}</div>
+            <div>
+              {{
+                v.status == 0
+                  ? "未付款"
+                  : v.status == 1
+                  ? "确认中"
+                  : v.status == 2
+                  ? "确认成功"
+                  : "确认失败"
+              }}
+            </div>
+          </div>
           <div>
-            {{
-              v.status == 0
-                ? "未付款"
-                : v.status == 1
-                ? "确认中"
-                : v.status == 2
-                ? "确认成功"
-                : "确认失败"
-            }}
+            <div>单价(SOKE/份)</div>
+            <div>{{ v.unit_price }}</div>
+          </div>
+
+          <div>
+            <div>周期</div>
+            <div>{{ v.period }}</div>
+          </div>
+          <div>
+            <div>手续费</div>
+            <div>{{ (v.redeem_fee * 1).toFixed(6) }}</div>
+          </div>
+          <div>
+            <div>支付(SOKE)</div>
+            <div>{{ v.amount }}</div>
+          </div>
+          <div>
+            <div>单号</div>
+            <div>{{ v.no }}</div>
+          </div>
+          <div>
+            <div>数量</div>
+            <div>{{ v.volume }}份</div>
+          </div>
+          <div>
+            <div>赎回时间</div>
+            <div>{{ v.created_at }}</div>
           </div>
         </div>
-        <div>
-          <div>单价(SOKE/份)</div>
-          <div>{{ v.unit_price }}</div>
-        </div>
-
-        <div>
-          <div>周期</div>
-          <div>{{ v.period }}</div>
-        </div>
-
-        <div>
-          <div>支付(SOKE)</div>
-          <div>12121.00</div>
-        </div>
-        <div>
-          <div>单号</div>
-          <div>{{ v.no }}</div>
-        </div>
-        <div>
-          <div>数量</div>
-          <div>{{ v.volume }}份</div>
-        </div>
-        <div>
-          <div>购买时间</div>
-          <div>{{ v.created_at }}</div>
-        </div>
+        <el-pagination
+          :total="allsell"
+          :page-size="10"
+          @current-change="pagechangesell"
+          background
+          layout="prev, pager, next"
+        >
+        </el-pagination>
       </div>
+
       <div class="nodata_wrapper" v-show="fundbackhis == null || fundbackhis.length == 0">
         <img src="../assets/img/no.png" alt="" />
         <div>暂无数据</div>
@@ -116,10 +145,11 @@
 import { fundhistory, fundbackhistory } from "../api";
 export default {
   mounted() {
-    fundhistory(localStorage.getItem("token"))
+    fundhistory({ page: 1, per_page: 10 }, localStorage.getItem("token"))
       .then((res) => {
         if (res.data.code == 200) {
           this.fundhis = res.data.data;
+          this.allbuy = res.data.page.total;
         } else if (res.data.code == 403) {
           this.$message.error(res.data.message);
           localStorage.removeItem("token");
@@ -132,10 +162,11 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-    fundbackhistory(localStorage.getItem("token"))
+    fundbackhistory({ page: 1, per_page: 10 }, localStorage.getItem("token"))
       .then((res) => {
         if (res.data.code == 200) {
           this.fundbackhis = res.data.data;
+          this.allsell = res.data.page.total;
         } else if (res.data.code == 403) {
           this.$message.error(res.data.message);
           localStorage.removeItem("token");
@@ -154,13 +185,15 @@ export default {
       tableshow: 0,
       fundhis: [],
       fundbackhis: [],
+      allbuy: 0,
+      allsell: 0,
     };
   },
   methods: {
     changeshow(n) {
       this.tableshow = n;
     },
-    getfundback(id, p, m, n) {
+    getfundback(id, p, m, n, fe) {
       this.$router.push({
         path: "/redemption",
         query: {
@@ -168,8 +201,47 @@ export default {
           p,
           m,
           n,
+          fe,
         },
       });
+    },
+    pagechangebuy(e) {
+      fundhistory({ page: e, per_page: 10 }, localStorage.getItem("token"))
+        .then((res) => {
+          if (res.data.code == 200) {
+            this.fundhis = res.data.data;
+            this.allbuy = res.data.page.total;
+          } else if (res.data.code == 403) {
+            this.$message.error(res.data.message);
+            localStorage.removeItem("token");
+            localStorage.removeItem("address");
+            this.$router.push("/main");
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    pagechangesell(e) {
+      fundbackhistory({ page: e, per_page: 10 }, localStorage.getItem("token"))
+        .then((res) => {
+          if (res.data.code == 200) {
+            this.fundbackhis = res.data.data;
+            this.allsell = res.data.page.total;
+          } else if (res.data.code == 403) {
+            this.$message.error(res.data.message);
+            localStorage.removeItem("token");
+            localStorage.removeItem("address");
+            this.$router.push("/main");
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };

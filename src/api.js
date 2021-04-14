@@ -2,6 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 
 var baseurl = 'http://94.74.122.203:9502'
+    // var baseurl = 'https://api.soke.network'
 
 export function getkline(params, token) {
     return axios({
@@ -169,9 +170,10 @@ export function rewardfunds(p, token) {
     })
 }
 //基金购买记录
-export function fundhistory(token) {
+export function fundhistory(p, token) {
     return axios({
         method: 'get',
+        params: p,
         url: `${baseurl}/api/v1/fund/buy/logs`,
         headers: {
             Authorization: 'Bearer ' + token,
@@ -180,9 +182,10 @@ export function fundhistory(token) {
 }
 
 //基金赎回记录
-export function fundbackhistory(token) {
+export function fundbackhistory(p, token) {
     return axios({
         method: 'get',
+        params: p,
         url: `${baseurl}/api/v1/fund/redeem/logs`,
         headers: {
             Authorization: 'Bearer ' + token,
@@ -190,9 +193,10 @@ export function fundbackhistory(token) {
     })
 }
 //基金盈亏记录
-export function fundreward(token) {
+export function fundreward(p, token) {
     return axios({
         method: 'get',
+        params: p,
         url: `${baseurl}/api/v1/fund/reward/logs`,
         headers: {
             Authorization: 'Bearer ' + token,
@@ -341,9 +345,10 @@ export function powerrewrad(p, token) {
     })
 }
 //做市盈亏
-export function marketrewrad(token) {
+export function marketrewrad(p, token) {
     return axios({
         method: 'get',
+        params: p,
         url: `${baseurl}/api/v1/market/reward/logs`,
         headers: {
             Authorization: 'Bearer ' + token,
@@ -351,10 +356,10 @@ export function marketrewrad(token) {
     })
 }
 //指数盈亏
-export function contractrewrad(token) {
+export function contractrewrad(p, token) {
     return axios({
         method: 'get',
-        // params: params,
+        params: p,
         url: `${baseurl}/api/v1/contract/reward/logs`,
         headers: {
             Authorization: 'Bearer ' + token,

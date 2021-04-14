@@ -1,51 +1,66 @@
 <template>
   <div class="wrapper-height">
-    <div></div>
-    <div v-for="(v, i) in orderlist" :key="i" class="table_list">
-      <div class="title">
-        <div>
-          <span
-            :class="[
-              { rise_color: v.direction == 'buy' },
-              { down_color: v.direction !== 'buy' },
-            ]"
-            >{{ v.direction == "buy" ? "买入" : "卖出" }}</span
-          >
-          {{ v.index.sub_title }}({{ v.lever }}X)
-        </div>
-        <!-- <div>
+    <div v-show="orderlist.length !== 0">
+      <div v-for="(v, i) in orderlist" :key="i" class="table_list">
+        <div class="title">
+          <div>
+            <span
+              :class="[
+                { rise_color: v.direction == 'buy' },
+                { down_color: v.direction !== 'buy' },
+              ]"
+              >{{ v.direction == "buy" ? "买入" : "卖出" }}</span
+            >
+            {{ v.index.sub_title }}({{ v.lever }}X)
+          </div>
+          <!-- <div>
           已取消
           <div>取消时间:10-10 10:10:10</div>
         </div> -->
+        </div>
+        <div class="list_info">
+          <div>
+            <div>{{ v.price }}</div>
+            <div>委托价格</div>
+          </div>
+          <div>
+            <div>{{ v.volume }}</div>
+            <div>委托数量</div>
+          </div>
+          <div>
+            <div>{{ v.trade_volume }}</div>
+            <div>成交数量</div>
+          </div>
+        </div>
+        <div class="list_info">
+          <div>
+            <div>{{ v.fee }}</div>
+            <div>手续费(SOKE)</div>
+          </div>
+          <div>
+            <div>{{ v.created_at }}</div>
+            <div>委托时间</div>
+          </div>
+          <div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
       </div>
-      <div class="list_info">
-        <div>
-          <div>{{ v.price }}</div>
-          <div>委托价格</div>
-        </div>
-        <div>
-          <div>{{ v.volume }}</div>
-          <div>委托数量</div>
-        </div>
-        <div>
-          <div>{{ v.trade_volume }}</div>
-          <div>成交数量</div>
-        </div>
+      <div>
+        <el-pagination
+          :total="allpagefund"
+          :page-size="10"
+          @current-change="pagechangefund"
+          background
+          layout="prev, pager, next"
+        >
+        </el-pagination>
       </div>
-      <div class="list_info">
-        <div>
-          <div>{{ v.fee }}</div>
-          <div>手续费(SOKE)</div>
-        </div>
-        <div>
-          <div>{{ v.created_at }}</div>
-          <div>委托时间</div>
-        </div>
-        <div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
+    </div>
+    <div class="nodata_wrapper" v-show="orderlist.length == 0">
+      <img src="../assets/img/no.png" alt="" />
+      <div>暂无数据</div>
     </div>
   </div>
 </template>
@@ -54,10 +69,11 @@
 import { historyorders } from "../api";
 export default {
   mounted() {
-    historyorders({ page: 1, per_page: 1 }, localStorage.getItem("token"))
+    historyorders({ page: 1, per_page: 10 }, localStorage.getItem("token"))
       .then((res) => {
         console.log(res);
         this.orderlist = res.data.data;
+        this.allpagefund = res.data.page.total;
       })
       .catch((err) => {
         console.log(err);
@@ -66,7 +82,21 @@ export default {
   data() {
     return {
       orderlist: [],
+      allpagefund: 0,
     };
+  },
+  methods: {
+    pagechangefund(e) {
+      historyorders({ page: e, per_page: 10 }, localStorage.getItem("token"))
+        .then((res) => {
+          console.log(res);
+          this.orderlist = res.data.data;
+          this.allpagefund = res.data.page.total;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 };
 </script>

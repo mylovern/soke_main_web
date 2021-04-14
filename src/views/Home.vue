@@ -5,7 +5,12 @@
         <div class="nav_head">MENU</div>
         <div
           @click="changerouter('/')"
-          :class="['nav', { active: nowpath == '/main' || nowpath == '/personal' || nowpath=='/data'}]"
+          :class="[
+            'nav',
+            {
+              active: nowpath == '/main' || nowpath == '/personal' || nowpath == '/data',
+            },
+          ]"
         >
           首页
         </div>
@@ -42,7 +47,7 @@
         </div>
         <div
           @click="changerouter('/flow')"
-          :class="['nav', { active: nowpath == '/flow' || nowpath =='/flowdata' }]"
+          :class="['nav', { active: nowpath == '/flow' || nowpath == '/flowdata' }]"
         >
           Staking
         </div>
@@ -135,6 +140,7 @@ export default {
   },
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
+    this.nowpath = this.$route.path;
   },
   methods: {
     handleScroll() {

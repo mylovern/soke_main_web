@@ -4,7 +4,9 @@
     <div class="table_data">
       <div class="head">
         <div>赎回</div>
-        <div>手续费(SOKE): <span>12121.00</span></div>
+        <div>
+          手续费(SOKE): <span>{{ fe }}</span>
+        </div>
       </div>
       <div class="num">
         <div>{{ n }}</div>
@@ -12,14 +14,14 @@
       </div>
       <div class="month">
         <div>
-          基金周期: <span>{{ m }}月</span>
+          基金周期: <span>{{ p }}月</span>
         </div>
-        <div>金额(SOKE):{{ n * p }}</div>
+        <div>金额(SOKE):{{ n * m }}</div>
       </div>
     </div>
     <div class="notice">
       备注: <br />
-      SOKE定期基金赎回时会根据您的周期，计算出需要支付的手续费；计算方式：XXX
+      SOKE定期基金赎回时会根据您的周期，计算出需要支付的手续费；计算方式：(总周期-已经购买的天数)x购买的sokex0.01
     </div>
     <div @click="checkrep()" class="sure_btn">确定赎回</div>
   </div>
@@ -33,6 +35,7 @@ export default {
     this.m = this.$route.query.p;
     this.p = this.$route.query.m;
     this.n = this.$route.query.n;
+    this.fe = (this.$route.query.fe * 1).toFixed(6);
   },
   data() {
     return {
@@ -40,6 +43,7 @@ export default {
       p: undefined,
       m: undefined,
       n: undefined,
+      fe: undefined,
     };
   },
   methods: {
@@ -51,11 +55,12 @@ export default {
               message: res.data.message,
               type: "success",
             });
+            this.$router.push("/fundhistory");
           } else if (res.data.code == 403) {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");
             localStorage.removeItem("address");
-            this.$router.push('/main')
+            this.$router.push("/main");
           } else {
             this.$message.error(res.data.message);
           }

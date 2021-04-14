@@ -2,9 +2,9 @@
   <div class="wrapper-height">
     <div class="title">个人明细</div>
     <div class="choice_table">
-      <div @click="changeTable(0)">
+      <!-- <div @click="changeTable(0)">
         <div :class="{ active: shownum == 0 }">算力挖矿</div>
-      </div>
+      </div> -->
       <div @click="changeTable(1)">
         <div :class="{ active: shownum == 1 }">指数盈亏</div>
       </div>
@@ -15,7 +15,7 @@
         <div :class="{ active: shownum == 3 }">基金收益</div>
       </div>
     </div>
-    <div v-show="shownum == 0" class="data_list">
+    <!-- <div v-show="shownum == 0" class="data_list">
       <div>
         <div class="data_table_main" v-for="(v, i) in powerlist" :key="i">
           <div>{{ v.reward }}</div>
@@ -37,11 +37,13 @@
         <img src="../assets/img/no.png" alt="" />
         <div>暂无数据</div>
       </div>
-    </div>
+    </div> -->
     <div v-show="shownum == 2" class="data_list">
-      <div>
+      <div v-show="contractlist.length !== 0">
         <div class="data_table_main" v-for="(v, i) in contractlist" :key="i">
-          <div>{{ v.reward }}</div>
+          <div :class="[{ rise_color: v.reward > 0 }, { down_color: v.reward <= 0 }]">
+            <span v-show="v.reward > 0">+</span>{{ v.reward }}
+          </div>
           <div>{{ v.created_at }}</div>
         </div>
         <div>
@@ -86,9 +88,11 @@
       </div>
     </div>
     <div v-show="shownum == 3" class="data_list">
-      <div>
+      <div v-show="fundloss.length !== 0">
         <div class="data_table_main" v-for="(v, i) in fundloss" :key="i">
-          <div>{{ v.reward }}</div>
+          <div :class="[{ rise_color: v.reward > 0 }, { down_color: v.reward <= 0 }]">
+            <span v-show="v.reward > 0">+</span>{{ v.reward }}
+          </div>
           <div>{{ v.created_at }}</div>
         </div>
         <div>
@@ -112,11 +116,11 @@
 </template>
 
 <script>
-import { fundreward, powerrewrad, marketrewrad, contractrewrad } from "../api";
+import { fundreward, marketrewrad, contractrewrad } from "../api";
 export default {
   data() {
     return {
-      shownum: 0,
+      shownum: 1,
       fundloss: [],
       powerlist: [],
       marketlist: [],
@@ -128,33 +132,34 @@ export default {
     };
   },
   mounted() {
-    marketrewrad(localStorage.getItem("token"))
+    marketrewrad({ page: 1, per_page: 10 }, localStorage.getItem("token"))
       .then((res) => {
         this.contractlist = res.data.data;
+        this.allmarketnum = res.data.page.total;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    contractrewrad({ page: 1, per_page: 10 }, localStorage.getItem("token"))
+      .then((res) => {
+        this.marketlist = res.data.data;
         this.allpagemarket = res.data.page.total;
       })
       .catch((err) => {
         console.log(err);
       });
-    contractrewrad(localStorage.getItem("token"))
-      .then((res) => {
-        this.marketlist = res.data.data;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    powerrewrad({ page: 1, per_page: 1 }, localStorage.getItem("token"))
-      .then((res) => {
-        console.log(res);
-        this.powerlist = res.data.data;
-        this.allpowerpool = res.data.page.total;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    fundreward(localStorage.getItem("token"))
+    // powerrewrad({ page: 1, per_page: 10 }, localStorage.getItem("token"))
+    //   .then((res) => {
+    //     this.powerlist = res.data.data;
+    //     this.allpowerpool = res.data.page.total;
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+    fundreward({ page: 1, per_page: 10 }, localStorage.getItem("token"))
       .then((res) => {
         this.fundloss = res.data.data;
+        this.allpagefund = res.data.page.total;
       })
       .catch((err) => {
         console.log(err);
@@ -165,16 +170,37 @@ export default {
       this.shownum = n;
     },
     pagechange(e) {
-      console.log(e);
+      contractrewrad({ page: e, per_page: 10 }, localStorage.getItem("token"))
+        .then((res) => {
+          this.marketlist = res.data.data;
+          this.allpagemarket = res.data.data.page.total;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     pagechangepower(e) {
       console.log(e);
     },
     pagechangemarket(e) {
-      console.log(e);
+      marketrewrad({ page: e, per_page: 10 }, localStorage.getItem("token"))
+        .then((res) => {
+          this.contractlist = res.data.data;
+          this.allmarketnum = res.data.page.total;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     pagechangefund(e) {
-      console.log(e);
+      fundreward({ page: e, per_page: 10 }, localStorage.getItem("token"))
+        .then((res) => {
+          this.fundloss = res.data.data;
+          this.allpagefund = res.data.page.total;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };
@@ -211,7 +237,7 @@ export default {
       font-family: Microsoft YaHei;
       font-weight: 400;
       color: rgba(0, 0, 0, 0.7);
-      width: 230px;
+      width: 306.6px;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
   }

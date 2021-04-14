@@ -36,7 +36,7 @@
     <div class="main_data">
       <div>
         <div>SOKE矿池(SOKE)</div>
-        <div>{{ poolbalance }}</div>
+        <div>{{ poolbalance * 1 + pool_balnace * 1 }}</div>
       </div>
 
       <div>
@@ -168,7 +168,7 @@
       </div>
       <div class="soke_start_main">
         <div>
-          <!-- 我的质押OKT:<span> {{ balance }}</span> -->
+          剩余SOKE:<span> {{ pool_balnace }}</span>
         </div>
         <div>
           当前挖矿收益:<span>1算力:{{ power_rate }}SOKE</span>
@@ -302,21 +302,21 @@
     </el-dialog>
 
     <!-- 解除质押 -->
-    <el-dialog title="解除质押" :visible.sync="removePledge" width="30%" center>
+    <!-- <el-dialog title="解除质押" :visible.sync="removePledgepool" width="30%" center>
       <div class="pledge_wrapper">
         <div class="pledge_num">
           <div>金额</div>
-          <div><span>可用(OKT):</span>{{ oktbalance }}</div>
+          <div><span>可用(OKT):</span>{{ myplodge }}</div>
         </div>
         <div class="pledge_inp">
-          <input v-model="pNumremove" type="text" />
+          <input v-model="pNumremovesoke" type="text" />
           <span>OKT</span>
         </div>
-        <div @click="removepledge()" class="sure_p_btn">确定解除</div>
+        <div @click="removepledgepoolokt()" class="sure_p_btn">确定解除</div>
       </div>
-    </el-dialog>
+    </el-dialog> -->
     <!-- 解除质押 -->
-    <el-dialog title="解除质押" :visible.sync="removePledgesoke" width="30%" center>
+    <el-dialog title="解除质押" :visible.sync="removePledgesokeflag" width="30%" center>
       <div class="pledge_wrapper">
         <div class="pledge_num">
           <div>金额</div>
@@ -326,7 +326,7 @@
           <input v-model="pNumremove" type="text" />
           <span>SOKE</span>
         </div>
-        <div @click="removepledge()" class="sure_p_btn">确定解除</div>
+        <div @click="removepledgesokecontrol()" class="sure_p_btn">确定解除</div>
       </div>
     </el-dialog>
     <!-- 充值弹框 -->
@@ -409,6 +409,7 @@ import {
   getwithdraw,
   getbalanceokt,
   getmypledge,
+  Cancelple,
 } from "../assets/web3";
 export default {
   mounted() {
@@ -451,6 +452,7 @@ export default {
         location.reload();
       }
     });
+
     //获取我的质押
     getmypledge(this.copyaddress)
       .then((res) => {
@@ -476,7 +478,7 @@ export default {
     });
 
     //  查询soke矿池余额
-    balancedata("0xe871e5b1109950a3ba75d546edd3f166ec93e4af").then((res) => {
+    balancedata("0x128339c3fdC9348439223731EB7E17B21Faa2a7A").then((res) => {
       this.poolbalance = (res / 1000000).toFixed(6);
     });
     //查询钱包余额
@@ -506,6 +508,9 @@ export default {
         //查询激励incentive_pool
         balancedata(this.global.incentive_pool_address).then((res) => {
           this.incentive_pool = (res / 1000000).toFixed(6);
+        });
+        balancedata(res.data.data.power.power_pool_address).then((res) => {
+          this.pool_balnace = (res / 1000000).toFixed(6);
         });
       })
       .catch((err) => {
@@ -562,7 +567,8 @@ export default {
       Pledge: false,
       pNum: undefined,
       pNumremove: undefined,
-      removePledge: false,
+      removePledgesokeflag: false,
+      removePledgepool: false,
       rechargeNum: undefined,
       recharge: false,
       despoit: false,
@@ -584,8 +590,9 @@ export default {
       nowincome: 0,
       oktbalance: 0,
       incentive_pool: 0.0,
-      removePledgesoke: false,
       myplodge: 0.0,
+      pNumremovesoke: undefined,
+      pool_balnace: 0,
     };
   },
   methods: {
@@ -641,6 +648,21 @@ export default {
           id,
         },
       });
+    },
+    //流动性矿池解除质押
+    removepledgepoolokt() {
+      if (this.pNumremovesoke == undefined || this.pNumremovesoke.length == 0) {
+        this.$message.error("请输入解除质押数量");
+        return false;
+      }
+      this.removePledgepool = !this.removePledgepool;
+      Cancelple(this.copyaddress, this.pNumremovesoke)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     //提现
     despoitnum() {
@@ -902,12 +924,18 @@ export default {
               .then((res) => {
                 formalpledge({ no: this.no, id: res }, localStorage.getItem("token"))
                   .then((res) => {
+                    console.log(res);
                     if (res.status == 200) {
-                      this.$message({
-                        message: "质押成功",
-                        type: "success",
-                      });
-                      location.reload();
+                      if (res.data.code !== 200) {
+                        this.$message.error(res.data.message);
+                      } else {
+                        this.$message({
+                          message: "质押成功",
+                          type: "success",
+                        });
+                      }
+
+                      // location.reload();
                     }
                   })
                   .catch((err) => {
@@ -977,12 +1005,12 @@ export default {
         this.Pledgepool = !this.Pledgepool;
       }
     },
-    removepledge() {
+    removepledgesokecontrol() {
       if (this.pNumremove == undefined || this.pNumremove.length == 0) {
         this.$message.error("请输入解除质押数量");
         return false;
       }
-      this.removePledge = !this.removePledge;
+      this.removePledgesokeflag = !this.removePledgesokeflag;
       removepledge({ amount: this.pNumremove }, localStorage.getItem("token"))
         .then((res) => {
           console.log(res);
@@ -996,7 +1024,6 @@ export default {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");
             localStorage.removeItem("address");
-            // location.reload();
           } else {
             this.$message.error(res.data.message);
           }
@@ -1007,28 +1034,61 @@ export default {
     },
     dialogpledgeremove() {
       if (localStorage.getItem("token") == null) {
+        if (this.myplodge == 0) {
+          this.$message.error("当前质押为0");
+          return false;
+        }
         check(this.copyaddress).then((res) => {
           if (res) {
-            this.removePledge = !this.removePledge;
+            Cancelple(this.copyaddress)
+              .then((data) => {
+                if (data) {
+                  this.$message({
+                    message: "解除质押成功",
+                    type: "success",
+                  });
+                  location.reload();
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                this.$message.error("解除质押失败");
+              });
           } else {
             this.$message.error("授权失败请重试");
           }
         });
       } else {
-        this.removePledge = !this.removePledge;
+        if (this.myplodge == 0) {
+          this.$message.error("当前质押为0");
+          return false;
+        }
+        Cancelple(this.copyaddress)
+          .then((res) => {
+            if (res) {
+              this.$message({
+                message: "解除质押成功",
+                type: "success",
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            this.$message.error("解除质押失败");
+          });
       }
     },
     dialogpledgeremovesoke() {
       if (localStorage.getItem("token") == null) {
         check(this.copyaddress).then((res) => {
           if (res) {
-            this.removePledgesoke = !this.removePledgesoke;
+            this.removePledgesokeflag = !this.removePledgesokeflag;
           } else {
             this.$message.error("授权失败请重试");
           }
         });
       } else {
-        this.removePledgesoke = !this.removePledgesoke;
+        this.removePledgesokeflag = !this.removePledgesokeflag;
       }
     },
     dialogrecharge() {

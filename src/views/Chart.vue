@@ -9,7 +9,13 @@
       </div>
       <div>
         <el-select v-model="valuepice" placeholder="指数交易对">
-          <el-option v-for="item in listlable" :key="item" :label="item" :value="item">
+          <el-option
+            :disabled="true"
+            v-for="item in listlable"
+            :key="item"
+            :label="item"
+            :value="item"
+          >
           </el-option>
         </el-select>
       </div>
@@ -87,8 +93,11 @@
     <div>
       <div class="table_data">
         <div class="title">
-          <div>SOKE-MAIN</div>
-          <div>杠杆倍数20X <img src="../assets/menu1.png" alt="" /></div>
+          <div>{{ value }}</div>
+          <div>
+            <span>杠杆倍数{{ lever }}</span
+            ><img src="../assets/menu1.png" alt="" />
+          </div>
         </div>
         <div class="limit">
           <span
@@ -311,9 +320,9 @@
       </div>
 
       <!-- 现价购买 -->
-      <el-dialog title="现价买多" :visible.sync="dialogVisible" width="30%">
+      <el-dialog :title="buytitle" :visible.sync="dialogVisible" width="30%">
         <div class="buy_dialog">
-          <div class="dialog_title">SOKE-MAIN(20X)</div>
+          <div class="dialog_title">{{ value }}({{ lever }}X)</div>
           <div class="dialog_list">
             <div>委托价格(SOKE)</div>
             <div>{{ price }}</div>
@@ -326,7 +335,7 @@
 
           <div v-show="price !== '市价'" class="dialog_list">
             <div>冻结保证金</div>
-            <div>{{ (price * num) / 20 }} SOKE</div>
+            <div>{{ ((price == undefined ? 0 : price) * num) / lever }} SOKE</div>
           </div>
         </div>
         <span slot="footer" class="dialog-footer">
@@ -336,13 +345,9 @@
 
       <!-- 现价卖空 -->
       <div class="sell_wrapper_dialog">
-        <el-dialog
-          :title="price == '市价' ? '市价' : '限价'"
-          :visible.sync="dialogVisiblesell"
-          width="30%"
-        >
+        <el-dialog :title="selltitle" :visible.sync="dialogVisiblesell" width="30%">
           <div class="buy_dialog">
-            <div class="dialog_title">SOKE-MAIN(20X)</div>
+            <div class="dialog_title">{{ value }}({{ lever }}X)</div>
             <div class="dialog_list">
               <div>委托价格(SOKE)</div>
               <div>{{ price }}</div>
@@ -355,7 +360,7 @@
 
             <div v-show="price !== '市价'" class="dialog_list">
               <div>冻结保证金</div>
-              <div>{{ ((price == undefined ? 0 : price) * num) / 20 }} SOKE</div>
+              <div>{{ ((price == undefined ? 0 : price) * num) / lever }} SOKE</div>
             </div>
           </div>
           <span slot="footer" class="dialog-footer">
@@ -410,6 +415,9 @@ export default {
       nowlist: 0,
       mydata: {},
       code: "",
+      lever: 0,
+      buytitle: "限价买多",
+      selltitle: "限价做空",
     };
   },
   methods: {
@@ -417,7 +425,10 @@ export default {
     indexchange(e) {
       for (let v of this.indexlist) {
         if (v.id == e) {
+          this.value = v.title;
           this.code = v.code;
+          this.listlable = v.symbols;
+          this.lever = v.lever;
         }
       }
       this.nowtype = e;
@@ -499,6 +510,7 @@ export default {
     },
     initweb() {
       let url = "ws://94.74.122.203:9502/ws?token=" + localStorage.getItem("token"); // 创建websocket连接
+      // let url = "wss://ws.soke.network/ws?token=" + localStorage.getItem("token"); // 创建websocket连接
       this.websock = new WebSocket(url); // 监听打开
       this.websock.onopen = this.websockOpen; // 监听关闭
       this.websock.onclose = this.websockClose; //监听异常
@@ -577,15 +589,16 @@ export default {
           console.log(err);
         });
     },
+    // 打开购买table
     openbuytable() {
-      if (this.num == "") {
+      if (this.num == "" || this.num == undefined) {
         this.$message({
           message: "请输入数量",
           type: "warning",
         });
         return false;
       }
-      if (this.price == "") {
+      if (this.price == "" || this.price == undefined) {
         this.$message({
           message: "请输入价格",
           type: "warning",
@@ -594,15 +607,16 @@ export default {
       }
       this.dialogVisible = true;
     },
+    // 打开出售table
     openselltable() {
-      if (this.num == "") {
+      if (this.num == "" || this.num == undefined) {
         this.$message({
           message: "请输入数量",
           type: "warning",
         });
         return false;
       }
-      if (this.price == "") {
+      if (this.price == "" || this.price == undefined) {
         this.$message({
           message: "请输入价格",
           type: "warning",
@@ -615,8 +629,12 @@ export default {
       this.price_type = t;
       if (t == "market") {
         this.price = "市价";
+        this.buytitle = "市价买多";
+        this.selltitle = "市价做空";
       } else {
         this.price = undefined;
+        this.buytitle = "限价买多";
+        this.selltitle = "限价做空";
       }
     },
 
@@ -692,6 +710,7 @@ export default {
             });
             this.dialogVisible = false;
             this.dialogVisiblesell = false;
+            location.reload();
           } else if (res.data.code == 403) {
             this.$message.error(res.data.message);
             localStorage.removeItem("token");
@@ -762,6 +781,7 @@ export default {
               this.value = v.title;
               this.code = v.code;
               this.listlable = v.symbols;
+              this.lever = v.lever;
             }
           }
         } else if (res.data.code == 403) {
@@ -1336,6 +1356,8 @@ export default {
       font-weight: 400;
       color: #000000;
       margin-right: 20px;
+      display: flex;
+      align-items: center;
       img {
         height: 20px;
       }

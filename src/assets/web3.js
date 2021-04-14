@@ -432,7 +432,7 @@ function contrat(to, address, value) {
 
 }
 //获取soke余额
-function getbalance(address) {
+function getbalancesoke(address) {
     return new Promise((resolve, rejected) => {
         var mycontract = new Web3.eth.Contract(abi, '0x4472176e3aa12aff50acf41e8c8044446a90ea62')
         mycontract.methods.balanceOf(address).call(function(err, res) {
@@ -454,7 +454,7 @@ function getbalance(address) {
 function flowpool(address, value) {
 
     return new Promise((resolve, rejected) => {
-        let poolcontract = new Web3.eth.Contract(poolabi, '0x34E3c8C3d0fa743e9e0CdF9f9B77786aC62168b4')
+        let poolcontract = new Web3.eth.Contract(poolabi, '0x128339c3fdC9348439223731EB7E17B21Faa2a7A')
         poolcontract.methods.pledge().send({ from: address, value: Web3.utils.toWei('' + value, 'ether') }, function(err, res) {
 
             if (res) {
@@ -470,8 +470,8 @@ function flowpool(address, value) {
 //流动矿池解除质押
 function Cancelflowpool(address) {
     return new Promise(resolve => {
-        let poolcontract = new Web3.eth.Contract(poolabi, '0x34E3c8C3d0fa743e9e0CdF9f9B77786aC62168b4')
-        poolcontract.methods.cancelPledge().send({ from: address, value: 10 }, function(err, res) {
+        let poolcontract = new Web3.eth.Contract(poolabi, '0x128339c3fdC9348439223731EB7E17B21Faa2a7A')
+        poolcontract.methods.cancelPledge().send({ from: address }, function(err, res) {
             resolve(res)
             resolve(err)
         })
@@ -481,7 +481,7 @@ function Cancelflowpool(address) {
 //获取可领取收益getProfit
 function getincome(address) {
     return new Promise(function(resolve, rejected) {
-        let poolcontract = new Web3.eth.Contract(poolabi, '0x34E3c8C3d0fa743e9e0CdF9f9B77786aC62168b4')
+        let poolcontract = new Web3.eth.Contract(poolabi, '0x128339c3fdC9348439223731EB7E17B21Faa2a7A')
         poolcontract.methods.getProfit().call({ from: address }, function(err, res) {
             if (res) {
                 resolve(res)
@@ -497,7 +497,7 @@ function getincome(address) {
 //获取收益
 function clickwihthdraw(address) {
     return new Promise((resolve, rejected) => {
-        let poolcontract = new Web3.eth.Contract(poolabi, '0x34E3c8C3d0fa743e9e0CdF9f9B77786aC62168b4')
+        let poolcontract = new Web3.eth.Contract(poolabi, '0x128339c3fdC9348439223731EB7E17B21Faa2a7A')
         poolcontract.methods.withdraw().send({ from: address }, function(err, res) {
             if (res) {
                 resolve(res)
@@ -524,7 +524,7 @@ function getoktbalance(address) {
 //流动性矿池获取总质押
 function allpledge() {
     return new Promise((resolve, rejected) => {
-        var mycontract = new Web3.eth.Contract(poolabi, '0x34E3c8C3d0fa743e9e0CdF9f9B77786aC62168b4')
+        var mycontract = new Web3.eth.Contract(poolabi, '0x128339c3fdC9348439223731EB7E17B21Faa2a7A')
         mycontract.methods.totalPledge().call(function(err, res) {
             if (res) {
 
@@ -544,7 +544,7 @@ function allpledge() {
 //我的质押
 function mypledge(address) {
     return new Promise((resolve, rejected) => {
-        var mycontract = new Web3.eth.Contract(poolabi, '0x34E3c8C3d0fa743e9e0CdF9f9B77786aC62168b4')
+        var mycontract = new Web3.eth.Contract(poolabi, '0x128339c3fdC9348439223731EB7E17B21Faa2a7A')
         mycontract.methods.getPledge().call({ from: address }, function(err, res) {
             if (res) {
 
@@ -589,7 +589,7 @@ export async function poolpledge(address, value) {
     return data
 }
 export async function balancedata(address) {
-    let data = await getbalance(address)
+    let data = await getbalancesoke(address)
     return data
 }
 export async function Cancelple(address) {

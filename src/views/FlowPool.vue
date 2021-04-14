@@ -53,7 +53,7 @@
       </div>
       <div class="soke_start_main">
         <div>
-          <!-- 剩余(SOKE):<span> {{ balance }}</span> -->
+          剩余SOKE:<span> {{ pool_balnace }}</span>
         </div>
         <div>
           当前挖矿收益:<span>1算力:{{ power_rate }} SOKE</span>
@@ -80,7 +80,7 @@
       <div class="pledge_wrapper">
         <div class="pledge_num">
           <div>金额</div>
-          <div><span>可用(OKT):</span>{{ oktbalance }}</div>
+          <div><span>可用(OKT):</span>{{ myplodge }}</div>
         </div>
         <div class="pledge_inp">
           <input v-model="pNumremove" type="text" />
@@ -103,16 +103,17 @@ import {
   getwithdraw,
   getbalanceokt,
   getmypledge,
+  Cancelple,
 } from "../assets/web3";
 export default {
   mounted() {
     this.copyaddress = localStorage.getItem("address");
     //查询OKT余额
     getbalanceokt(this.copyaddress).then((res) => {
-      this.oktbalance = (res / 100000000000000000).toFixed(6);
+      this.oktbalance = (res / 1000000000000000000).toFixed(6);
     });
     //  查询soke矿池余额
-    balancedata("0xe871e5b1109950a3ba75d546edd3f166ec93e4af").then((res) => {
+    balancedata("0x128339c3fdC9348439223731EB7E17B21Faa2a7A").then((res) => {
       this.poolbalance = (res / 1000000).toFixed(6);
     });
     //查询钱包余额
@@ -120,9 +121,9 @@ export default {
       this.balance = (res / 1000000).toFixed(6);
     });
     //获取我的质押
-    getmypledge()
+    getmypledge(this.copyaddress)
       .then((res) => {
-        this.myplodge = res;
+        this.myplodge = res / 1000000000000000000;
       })
       .catch((err) => {
         console.log(err);
@@ -133,16 +134,16 @@ export default {
         if (res == 0) {
           this.allpledge = 0;
         } else {
-          this.allpledge = (1000 / (res / 100000000000000000)).toFixed(6);
+          this.allpledge = (1000 / (res / 1000000000000000000)).toFixed(6);
         }
       })
       .catch((err) => {
         console.log(err);
       });
     //获取当前可领取的收益
-    getprof()
+    getprof(this.copyaddress)
       .then((res) => {
-        this.nowincome = (res * 1).toFixed(6);
+        this.nowincome = ((res * 1) / 1000000).toFixed(6);
       })
       .catch((err) => {
         console.log(err);
@@ -158,6 +159,9 @@ export default {
         } else {
           this.startp = true;
         }
+        balancedata(res.data.data.power.power_pool_address).then((res) => {
+          this.pool_balnace = (res / 1000000).toFixed(6);
+        });
       })
       .catch((err) => {
         console.log(err);
@@ -195,6 +199,7 @@ export default {
       oktbalance: undefined,
       myplodge: 0,
       poolbalance: 0,
+      pool_balnace: 0,
     };
   },
   methods: {
@@ -378,15 +383,48 @@ export default {
     },
     dialogpledgeremove() {
       if (localStorage.getItem("token") == null) {
+        if (this.myplodge == 0) {
+          this.$message.error("当前质押为0");
+          return false;
+        }
         check(this.copyaddress).then((res) => {
           if (res) {
-            this.removePledge = !this.removePledge;
+            Cancelple(this.copyaddress)
+              .then((data) => {
+                if (data) {
+                  this.$message({
+                    message: "解除质押成功",
+                    type: "success",
+                  });
+                  location.reload();
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                this.$message.error("解除质押失败");
+              });
           } else {
             this.$message.error("授权失败请重试");
           }
         });
       } else {
-        this.removePledge = !this.removePledge;
+        if (this.myplodge == 0) {
+          this.$message.error("当前质押为0");
+          return false;
+        }
+        Cancelple(this.copyaddress)
+          .then((res) => {
+            if (res) {
+              this.$message({
+                message: "解除质押成功",
+                type: "success",
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            this.$message.error("解除质押失败");
+          });
       }
     },
   },
@@ -536,7 +574,6 @@ export default {
       color: #737373;
       span {
         color: #000;
-        font-weight: bold;
       }
     }
   }
