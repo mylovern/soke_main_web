@@ -222,7 +222,7 @@
             <div class="position_status" v-show="v.direction == 'buy'">多仓</div>
             <div class="position_status" v-show="v.direction == 'sell'">空仓</div>
             <div>
-              {{ v.index.sub_title }}({{ v.lever }}X)
+              {{ v.index.title }}({{ v.lever }}X)
               {{ (v.position_volume * 1).toFixed(2) }}手
             </div>
           </div>
@@ -233,7 +233,7 @@
             </div>
             <div class="soke_av">
               <div>{{ v.open_price }}</div>
-              <div>开仓均价(SOKE)</div>
+              <div>开仓均价(指数点数)</div>
             </div>
             <div class="soke_Unsettlement">
               <div>
@@ -257,7 +257,7 @@
 
             <div>
               <div>{{ v.liquidation_price }}</div>
-              <div>强平价格(SOKE)</div>
+              <div>强平点数</div>
             </div>
 
             <div>

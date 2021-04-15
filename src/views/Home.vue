@@ -51,7 +51,7 @@
         >
           Staking
         </div>
-        <div class="nav">教程</div>
+        <div @click="openpdf()" class="nav">教程</div>
         <div class="nav">白皮书</div>
         <div class="nav">审计报告</div>
       </div>
@@ -141,6 +141,7 @@ export default {
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
     this.nowpath = this.$route.path;
+    
   },
   methods: {
     handleScroll() {
@@ -153,6 +154,9 @@ export default {
     },
     changerouter(p) {
       this.$router.push(p);
+    },
+    openpdf() {
+      // window.open("https://maiimg.com/pdf/?e=agw.Bda6kUuP6m", "_blank");
     },
   },
 };

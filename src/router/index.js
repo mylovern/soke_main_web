@@ -115,7 +115,7 @@ const routes = [{
 
         }],
         redirect: '/main'
-    },
+    }
 
 ]
 

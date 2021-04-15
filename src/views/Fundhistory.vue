@@ -10,7 +10,7 @@
       </div>
     </div>
     <div v-show="tableshow == 0" class="buy_wrapper">
-      <div v-show="fundhis !== null || fundhis.length !== 0">
+      <div v-show="fundhis.length !== 0">
         <div v-for="(v, i) in fundhis" :key="i" class="data_table">
           <div class="head_data_table">
             <div>{{ v.product.title }}</div>
@@ -70,14 +70,14 @@
         </el-pagination>
       </div>
 
-      <div class="nodata_wrapper" v-show="fundhis == null || fundhis.length == 0">
+      <div class="nodata_wrapper" v-show="fundhis.length == 0">
         <img src="../assets/img/no.png" alt="" />
         <div>暂无数据</div>
       </div>
     </div>
 
     <div v-show="tableshow == 1" class="redemption">
-      <div v-show="fundbackhis !== null || fundbackhis.length !== 0">
+      <div v-show="fundbackhis.length !== 0">
         <div v-for="(v, i) in fundbackhis" :key="i" class="data_table">
           <div class="head_data_table">
             <div>{{ v.product.title }}</div>
@@ -133,7 +133,7 @@
         </el-pagination>
       </div>
 
-      <div class="nodata_wrapper" v-show="fundbackhis == null || fundbackhis.length == 0">
+      <div class="nodata_wrapper" v-show="fundbackhis.length == 0">
         <img src="../assets/img/no.png" alt="" />
         <div>暂无数据</div>
       </div>

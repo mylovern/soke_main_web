@@ -371,7 +371,15 @@ var poolabi = [{
     }
 ]
 var Web3 = new web3(window.ethereum)
-    //检测是否登录授权签名
+export function checknetwork() {
+    if (Web3.currentProvider.chainId == '0x41') {
+        return true
+    } else {
+        return false
+    }
+}
+
+//检测是否登录授权签名
 function checkloginwallet(address) {
     return new Promise(resolve => {
         getnonce({ address: address })

@@ -381,6 +381,7 @@
         </div>
       </el-dialog>
     </div>
+    <div v-show="netnotice" class="network_notice">网络错误,请切换OKExChain网络</div>
   </div>
 </template>
 
@@ -410,6 +411,7 @@ import {
   getbalanceokt,
   getmypledge,
   Cancelple,
+  checknetwork,
 } from "../assets/web3";
 export default {
   mounted() {
@@ -452,7 +454,14 @@ export default {
         location.reload();
       }
     });
-
+    window.ethereum.on("chainChanged", (res) => {
+      if (res !== "0x41") {
+        this.netnotice = true;
+      } else {
+        this.netnotice = false;
+        location.reload();
+      }
+    });
     //获取我的质押
     getmypledge(this.copyaddress)
       .then((res) => {
@@ -593,6 +602,7 @@ export default {
       myplodge: 0.0,
       pNumremovesoke: undefined,
       pool_balnace: 0,
+      netnotice: false,
     };
   },
   methods: {
@@ -626,6 +636,11 @@ export default {
         this.account = account;
         if (account) {
           check(account);
+          if (!checknetwork()) {
+            this.netnotice = true;
+          } else {
+            this.netnotice = false;
+          }
           this.walletcheck = false;
           this.copyaddress = account;
           localStorage.setItem("address", this.copyaddress);
@@ -1743,5 +1758,18 @@ export default {
 .address_wrapper_dialog /deep/.el-dialog__header {
   height: 0px !important;
   border-bottom: none !important;
+}
+.network_notice {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100px;
+  background: #df5f67;
+  line-height: 100px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 16px;
+  z-index: 99999999999999999999999999999999999999;
 }
 </style>
