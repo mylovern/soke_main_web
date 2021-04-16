@@ -95,7 +95,7 @@
         <div class="title">
           <div>{{ value }}</div>
           <div>
-            <span>杠杆倍数{{ lever }}</span
+            <span>杠杆倍数{{ lever }}X</span
             ><img src="../assets/menu1.png" alt="" />
           </div>
         </div>

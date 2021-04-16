@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper-height">
-    <div class="title">主流指数追踪基金</div>
+    <div class="title">{{ title }}</div>
     <div class="data_table">
       <div class="table_title">
         <div>总量：{{ allfundnum }}份，已售{{ allfundnum - remain_volume }}份</div>
@@ -68,6 +68,7 @@ export default {
         if (res.data.code == 200) {
           for (let v of res.data.data) {
             if (v.id == this.id) {
+              this.title = v.title;
               this.allfundnum = v.total_volume;
               this.remain_volume = v.remain_volume;
               this.periods = v.periods;
@@ -100,6 +101,7 @@ export default {
       profit: 0,
       mon: undefined,
       id: undefined,
+      title: "",
     };
   },
   methods: {
@@ -130,7 +132,7 @@ export default {
             transfermain(
               res.data.data.to,
               localStorage.getItem("address"),
-              (this.num * this.unit_price)
+              this.num * this.unit_price
             )
               .then((data) => {
                 if (data) {
