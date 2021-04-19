@@ -19,7 +19,7 @@
               剩余(soke):<span>{{ poolbalance }}</span>
             </div>
           </div>
-          <div style="cursor: pointer" @click="tolist()">
+          <div>
             当前收益: <span>1 OKT:{{ allpledge }} SOKE</span>
           </div>
         </div>
@@ -203,9 +203,7 @@ export default {
     };
   },
   methods: {
-    tolist() {
-      this.$router.push("/flowdata");
-    }, //领取收益
+    //领取收益
     getincome() {
       getwithdraw(this.copyaddress)
         .then((res) => {

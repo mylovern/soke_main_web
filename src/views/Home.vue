@@ -53,7 +53,7 @@
         </div>
         <div @click="openpdf()" class="nav">教程</div>
         <div class="nav">白皮书</div>
-        <div class="nav">审计报告</div>
+        <div @click="openaudit()" class="nav">审计报告</div>
       </div>
     </div>
 
@@ -141,7 +141,6 @@ export default {
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
     this.nowpath = this.$route.path;
-    
   },
   methods: {
     handleScroll() {
@@ -157,6 +156,11 @@ export default {
     },
     openpdf() {
       // window.open("https://maiimg.com/pdf/?e=agw.Bda6kUuP6m", "_blank");
+    },
+    openaudit() {
+      window.open(
+        "https://www.soke.network/api/profile/upload/2021/04/19/0cc6a4a1-0cbd-4367-85a4-51afeaf884f2.pdf"
+      );
     },
   },
 };

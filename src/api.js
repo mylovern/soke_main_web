@@ -1,8 +1,8 @@
 import axios from 'axios'
 import qs from 'qs'
 
-var baseurl = 'http://94.74.122.203:9502'
-    // var baseurl = 'https://api.soke.network'
+// var baseurl = 'http://94.74.122.203:9502'
+var baseurl = 'https://api.soke.network'
 
 export function getkline(params, token) {
     return axios({

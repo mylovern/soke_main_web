@@ -7,6 +7,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>Soke Network</title>
+    <script type="text/javascript">
+        if (/Android|webOS| iPhone | iPad | iPod |BlackBerry|opera mini|opera mobile|appleWebkit.*mobile|mobile/i.test(
+                navigator.userAgent)) {
+            window.location.href = "https://mtestnet.soke.network/";
+        }
+    </script>
 </head>
 
 <body>

@@ -509,8 +509,8 @@ export default {
       this.$router.push(p);
     },
     initweb() {
-      let url = "ws://94.74.122.203:9502/ws?token=" + localStorage.getItem("token"); // 创建websocket连接
-      // let url = "wss://ws.soke.network/ws?token=" + localStorage.getItem("token"); // 创建websocket连接
+      // let url = "ws://94.74.122.203:9502/ws?token=" + localStorage.getItem("token"); // 创建websocket连接
+      let url = "wss://ws.soke.network/ws?token=" + localStorage.getItem("token"); // 创建websocket连接
       this.websock = new WebSocket(url); // 监听打开
       this.websock.onopen = this.websockOpen; // 监听关闭
       this.websock.onclose = this.websockClose; //监听异常

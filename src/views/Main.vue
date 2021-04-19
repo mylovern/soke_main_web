@@ -82,7 +82,7 @@
       <div>
         <div>我的钱包地址</div>
         <div @click="openDialog()" style="cursor: pointer">
-          {{ copyaddress == "" ? "未登录" : copyaddress }}
+          {{ copyaddress == "" ? "请链接到钱包" : copyaddress }}
         </div>
       </div>
       <div>
@@ -134,7 +134,7 @@
               剩余(soke):<span>{{ poolbalance }}</span>
             </div>
           </div>
-          <div style="cursor: pointer" @click="changerouter('/flowdata')">
+          <div>
             当前收益: <span>1 OKT:{{ allpledge }} SOKE</span>
           </div>
         </div>
@@ -237,14 +237,14 @@
     <div class="swiper_wrapper">
       <div class="swiper-container">
         <div class="swiper-wrapper">
-          <div class="swiper-slide"><img src="../assets/img/BINANCE.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/BIT.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/ok.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/BITFINEX.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/BITTREX.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/huobi.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/MXC.png" alt="" /></div>
-          <div class="swiper-slide"><img src="../assets/img/gemini.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-01.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-02.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-03.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-04.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-05.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-06.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-07.png" alt="" /></div>
+          <div class="swiper-slide"><img src="../assets/img/brand-08.png" alt="" /></div>
         </div>
       </div>
     </div>
@@ -267,7 +267,7 @@
           />
         </div>
         <div v-show="token !== 'login'" @click="loginbtn()" class="sure_btn">
-          <div>登录</div>
+          <div>请链接到钱包</div>
         </div>
       </div>
     </el-dialog>
@@ -1570,7 +1570,7 @@ export default {
   width: 214px;
   height: 80px;
   img {
-    height: 80px;
+    width: 179px;
   }
 }
 .notice_wrapper {
