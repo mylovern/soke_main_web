@@ -95,8 +95,7 @@
         <div class="title">
           <div>{{ value }}</div>
           <div>
-            <span>杠杆倍数{{ lever }}X</span
-            ><img src="../assets/menu1.png" alt="" />
+            <span>杠杆倍数{{ lever }}X</span><img src="../assets/menu1.png" alt="" />
           </div>
         </div>
         <div class="limit">
@@ -1676,6 +1675,7 @@ export default {
     text-align: center;
     line-height: 46px;
     cursor: pointer;
+    margin-bottom: 40px;
   }
 }
 .list_table {

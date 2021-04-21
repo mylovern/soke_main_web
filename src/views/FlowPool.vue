@@ -113,7 +113,7 @@ export default {
       this.oktbalance = (res / 1000000000000000000).toFixed(6);
     });
     //  查询soke矿池余额
-    balancedata("0x128339c3fdC9348439223731EB7E17B21Faa2a7A").then((res) => {
+    balancedata("0x9e3b8F276aecbC2ceA854d7AE73C00E16be41763").then((res) => {
       this.poolbalance = (res / 1000000).toFixed(6);
     });
     //查询钱包余额
@@ -143,6 +143,7 @@ export default {
     //获取当前可领取的收益
     getprof(this.copyaddress)
       .then((res) => {
+        console.log(res);
         this.nowincome = ((res * 1) / 1000000).toFixed(6);
       })
       .catch((err) => {

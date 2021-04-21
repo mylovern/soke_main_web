@@ -11,7 +11,7 @@
               ]"
               >{{ v.direction == "buy" ? "买入" : "卖出" }}</span
             >
-            {{ v.index.sub_title }}({{ v.lever }}X)
+            {{ v.index.title }}({{ v.lever }}X)
           </div>
           <!-- <div>
           已取消

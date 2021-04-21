@@ -449,6 +449,11 @@ export default {
         }
       });
     }
+    if (localStorage.getItem("address") !== window.ethereum.selectedAddress) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("address");
+      this.getAccount();
+    }
     window.ethereum.on("accountsChanged", (accounts) => {
       if (accounts.length == 0) {
         location.reload();
@@ -487,7 +492,7 @@ export default {
     });
 
     //  查询soke矿池余额
-    balancedata("0x128339c3fdC9348439223731EB7E17B21Faa2a7A").then((res) => {
+    balancedata("0x9e3b8F276aecbC2ceA854d7AE73C00E16be41763").then((res) => {
       this.poolbalance = (res / 1000000).toFixed(6);
     });
     //查询钱包余额
