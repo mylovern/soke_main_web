@@ -194,7 +194,7 @@
       </div> -->
         <div v-show="price !== '市价'" class="list_wrapper">
           <div>冻结保证金</div>
-          <div>{{ ((price == undefined ? 0 : price) * num) / 20 }} SOKE</div>
+          <div>{{ ((price == undefined ? 0 : price) * num) / lever }} SOKE</div>
         </div>
         <div class="list_wrapper">
           <div>可用余额(SOKE)</div>
@@ -271,7 +271,7 @@
               <div>盈亏率</div>
             </div>
           </div>
-          <div @click="closeposition(v.id)" class="clear_btn">清仓</div>
+          <div @click="closeposition(v.id)" class="clear_btn">平仓</div>
         </div>
       </div>
 
@@ -641,6 +641,13 @@ export default {
       this.nowshow = n;
     },
     changesellpercent(n) {
+      if (this.price == "" || this.price == undefined) {
+        this.$message({
+          message: "请输入价格",
+          type: "warning",
+        });
+        return false;
+      }
       if (n == this.sellpercent) {
         this.sellpercent = undefined;
       } else {
@@ -652,6 +659,13 @@ export default {
       }
     },
     changebuypercent(n) {
+      if (this.price == "" || this.price == undefined) {
+        this.$message({
+          message: "请输入价格",
+          type: "warning",
+        });
+        return false;
+      }
       if (n == this.buypercent) {
         this.buypercent = undefined;
       } else {

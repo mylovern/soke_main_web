@@ -54,6 +54,7 @@
         <div @click="openpdf()" class="nav">教程</div>
         <div @click="openbook()" class="nav">白皮书</div>
         <div @click="openaudit()" class="nav">审计报告</div>
+        <div @click="opentel()" class="nav">Telegram</div>
       </div>
     </div>
 
@@ -143,6 +144,9 @@ export default {
     this.nowpath = this.$route.path;
   },
   methods: {
+    opentel() {
+      window.open("https://t.me/sokenetwork");
+    },
     handleScroll() {
       var scrollTop = window.scrollY;
       if (scrollTop > 80) {
