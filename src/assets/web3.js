@@ -370,6 +370,154 @@ var poolabi = [{
         "type": "function"
     }
 ]
+var sokeabi = [{
+        "constant": false,
+        "inputs": [],
+        "name": "cancelPledge",
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+        }],
+        "name": "pledge",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "_sokeTokenAddr",
+            "type": "address"
+        }],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "CancelPledge",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "Pledge",
+        "type": "event"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "withdraw",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "Withdraw",
+        "type": "event"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getPledge",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getProfit",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "totalPledge",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "totalRemain",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
 var Web3 = new web3(window.ethereum)
 export function checknetwork() {
     if (Web3.currentProvider.chainId == '0x41') {
@@ -568,6 +716,126 @@ function mypledge(address) {
     })
 
 }
+//soke 授权approve
+function sokeapprove(address, value) {
+    return new Promise((resolve, rejected) => {
+        let sokecontract = new Web3.eth.Contract(abi, '0x1ee27206637Be5990D6227010d456Ebf577EbfBd')
+        sokecontract.methods.approve('0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210', Web3.utils.toWei(value.toString(), 'mwei')).send({ from: address }, function(err, res) {
+            if (res) {
+                resolve(res)
+
+            } else {
+                rejected(err)
+                console.log(err)
+            }
+
+        })
+    })
+}
+
+//soke质押
+function sokepledgefunc(address, value) {
+    return new Promise((resolve, rejected) => {
+        let poolcontract = new Web3.eth.Contract(sokeabi, '0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210')
+        poolcontract.methods.pledge(Web3.utils.toWei(value.toString(), 'mwei')).send({ from: address }, function(err, res) {
+            if (res) {
+                resolve(res)
+                console.log(res)
+            } else {
+                rejected(err)
+                console.log(err)
+            }
+
+        })
+    })
+}
+//soke 解除质押
+function Cancelsoke(address) {
+    return new Promise(resolve => {
+        let poolcontract = new Web3.eth.Contract(sokeabi, '0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210')
+        poolcontract.methods.cancelPledge().send({ from: address }, function(err, res) {
+            resolve(res)
+            resolve(err)
+        })
+    })
+
+}
+
+//我的soke质押
+function mypledgesokefunc(address) {
+    return new Promise((resolve, rejected) => {
+        var mycontract = new Web3.eth.Contract(sokeabi, '0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210')
+        mycontract.methods.getPledge().call({ from: address }, function(err, res) {
+            if (res) {
+
+                resolve(res)
+
+            } else {
+                rejected(err)
+                console.log(err)
+            }
+
+        })
+
+
+    })
+
+}
+//soke矿池获取总质押
+function allpledgesoke() {
+    return new Promise((resolve, rejected) => {
+        var mycontract = new Web3.eth.Contract(poolabi, '0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210')
+        mycontract.methods.totalPledge().call(function(err, res) {
+            if (res) {
+
+                resolve(res)
+            } else {
+                rejected(err)
+            }
+
+
+        })
+
+
+    })
+
+}
+//soke可领取收益
+//获取可领取收益getProfit
+function getincomesoke(address) {
+    return new Promise(function(resolve, rejected) {
+        let poolcontract = new Web3.eth.Contract(sokeabi, '0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210')
+        poolcontract.methods.getProfit().call({ from: address }, function(err, res) {
+            if (res) {
+                resolve(res)
+                console.log(res)
+            } else {
+                rejected(err)
+                console.log(err)
+            }
+
+
+        })
+    })
+
+}
+
+//soke 领取收益
+
+function getprofitsoke(address) {
+    return new Promise((resolve, rejected) => {
+        let poolcontract = new Web3.eth.Contract(sokeabi, '0xb4Dcb96c813804d88cc9c5164A64651F07Bcf210')
+        poolcontract.methods.withdraw().send({ from: address }, function(err, res) {
+            if (res) {
+                resolve(res)
+            } else {
+                rejected(err)
+            }
+        })
+    })
+
+}
+
 
 
 
@@ -622,5 +890,35 @@ export async function getbalanceokt(address) {
 }
 export async function getmypledge(address) {
     let data = mypledge(address)
+    return data
+}
+export async function sokepledge(address, value) {
+    let data = sokepledgefunc(address, value)
+    return data
+}
+export async function canclesokepledge(address) {
+    let data = Cancelsoke(address)
+    return data
+}
+export async function mypledgesoke(address) {
+    let data = mypledgesokefunc(address)
+    return data
+}
+export async function mypledgesokeall() {
+    let data = allpledgesoke()
+    return data
+}
+export async function getprofsoke(address) {
+    let data = getincomesoke(address)
+    return data
+}
+//sokeapprove
+export async function approve(address, value) {
+    let data = sokeapprove(address, value)
+    return data
+}
+//getprofitsoke
+export async function sokeprofit(address) {
+    let data = getprofitsoke(address)
     return data
 }

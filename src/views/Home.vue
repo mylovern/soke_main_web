@@ -54,7 +54,7 @@
         <div @click="openpdf()" class="nav">教程</div>
         <div @click="openbook()" class="nav">白皮书</div>
         <div @click="openaudit()" class="nav">审计报告</div>
-        <div @click="opentel()" class="nav">Telegram</div>
+        <div @click="opentel()" class="nav">联系</div>
       </div>
     </div>
 
@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     opentel() {
-      window.open("https://t.me/sokenetwork");
+      window.open("https://www.yuque.com/sy65ei/manual/ck2tdi");
     },
     handleScroll() {
       var scrollTop = window.scrollY;
@@ -158,7 +158,9 @@ export default {
     changerouter(p) {
       this.$router.push(p);
     },
-    openpdf() {},
+    openpdf() {
+      window.open("https://www.yuque.com/sy65ei/manual");
+    },
     openaudit() {
       window.open(
         "https://www.soke.network/api/profile/upload/2021/04/19/0cc6a4a1-0cbd-4367-85a4-51afeaf884f2.pdf"

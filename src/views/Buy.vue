@@ -148,7 +148,31 @@ export default {
                         });
                         location.reload();
                       } else {
-                        this.$message.error("下单失败");
+                        this.$message.error("下单失败,请等待");
+                        var num = 0;
+                        this.timer = setInterval(() => {
+                          num = num + 1;
+                          formalfund(
+                            { no: res.data.data.no, id: data },
+                            localStorage.getItem("token")
+                          )
+                            .then((response) => {
+                              if (response.status == 200) {
+                                this.$message({
+                                  message: "下单成功",
+                                  type: "success",
+                                });
+                                clearInterval(this.timer);
+                                location.reload();
+                              }
+                              if (num == 10) {
+                                clearInterval(this.timer);
+                              }
+                            })
+                            .catch((er) => {
+                              console.log(er);
+                            });
+                        }, 5000);
                       }
                     })
                     .catch((er) => {

@@ -746,6 +746,37 @@ export default {
                         localStorage.removeItem("address");
                         // location.reload();
                       } else {
+                        let num = 0;
+                        this.timerrechagre = setInterval(() => {
+                          num = num + 1;
+                          formalrecharge(
+                            { no: res.data.data.no, id: data },
+                            localStorage.getItem("token")
+                          )
+                            .then((re) => {
+                              if (re.data.code == 200) {
+                                this.$message({
+                                  message: res.data.message,
+                                  type: "success",
+                                });
+                                clearInterval(this.timerrechagre);
+                                location.reload();
+                              }
+                              if (re.data.code == 403) {
+                                this.$message.error(re.data.message);
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("address");
+                                // location.reload();
+                                clearInterval(this.timerrechagre);
+                              }
+                              if (num == 10) {
+                                clearInterval(this.timerrechagre);
+                              }
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                            });
+                        }, 5000);
                         this.$message.error(re.data.message);
                       }
                     })
@@ -948,6 +979,33 @@ export default {
                     if (res.status == 200) {
                       if (res.data.code !== 200) {
                         this.$message.error(res.data.message);
+                        var num = 0;
+                        this.timer = setInterval(() => {
+                          num = num + 1;
+                          formalpledge(
+                            { no: this.no, id: res },
+                            localStorage.getItem("token")
+                          )
+                            .then((res) => {
+                              console.log(res);
+                              if (res.status == 200) {
+                                if (res.data.code == 200) {
+                                  this.$message({
+                                    message: "质押成功",
+                                    type: "success",
+                                  });
+                                  clearInterval(this.timer);
+                                }
+                                if (num == 10) {
+                                  clearInterval(this.timer);
+                                }
+                                // location.reload();
+                              }
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                            });
+                        }, 5000);
                       } else {
                         this.$message({
                           message: "质押成功",
